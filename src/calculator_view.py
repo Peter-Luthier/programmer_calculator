@@ -22,13 +22,13 @@ class CalculatorWindow(QMainWindow):
 
         # -- Input Mode Keys -- #
 
-        button_decimal = QPushButton('DEC')
+        button_decimal = QPushButton('Decimal')
         button_decimal.clicked.connect(self.set_input_mode_decimal)
 
-        button_hex = QPushButton('HEX')
+        button_hex = QPushButton('Hexadecimal')
         button_hex.clicked.connect(self.set_input_mode_hex)
 
-        button_binary = QPushButton('BIN')
+        button_binary = QPushButton('Binary')
         button_binary.clicked.connect(self.set_input_mode_binary)
 
         layout_input_mode = QHBoxLayout()
@@ -102,11 +102,11 @@ class CalculatorWindow(QMainWindow):
 
         # -- Output Displays -- #
 
-        decimal_label = QLabel('DEC')
+        decimal_label = QLabel('Decimal')
         self.decimal_output = QLabel()
-        hex_label = QLabel('HEX')
+        hex_label = QLabel('Hexadecimal')
         self.hex_output = QLabel()
-        binary_label = QLabel('BIN')
+        binary_label = QLabel('Binary')
         self.binary_output = QLabel()
 
         self.update_outputs()
@@ -139,19 +139,19 @@ class CalculatorWindow(QMainWindow):
     def set_input_mode_decimal(self):
         self.set_disabled_a_f_keys(True)
         self.set_disabled_2_9_keys(False)
-        self.ctrl.set_base_mode('decimal')
+        self.ctrl.set_base_mode('Decimal')
         print('Decimal Mode')
 
     def set_input_mode_hex(self):
         self.set_disabled_a_f_keys(False)
         self.set_disabled_2_9_keys(False)
-        self.ctrl.set_base_mode('hex')
-        print('HEX Mode')
+        self.ctrl.set_base_mode('Hexadecimal')
+        print('Hexadecimal Mode')
 
     def set_input_mode_binary(self):
         self.set_disabled_a_f_keys(True)
         self.set_disabled_2_9_keys(True)
-        self.ctrl.set_base_mode('binary')
+        self.ctrl.set_base_mode('Binary')
         print('Binary Mode')
 
     def set_disabled_a_f_keys(self, state: bool):
@@ -181,7 +181,7 @@ class CalculatorWindow(QMainWindow):
             """
 
     def handle_key_press(self, input_value):
-        self.ctrl.handle_numeric_input(input_value)
+        self.ctrl.handle_button_press(input_value)
         self.update_outputs()
 
     def update_outputs(self):
