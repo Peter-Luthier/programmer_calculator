@@ -8,7 +8,7 @@ class CalculatorController:
         self.setup_actions()
 
     def setup_actions(self):
-        for button in self.view.buttons:
+        for button in self.view.operand_buttons:
             self.view.update_button_action(button, self.handle_button_press)
 
     def handle_button_press(self, button_text):
