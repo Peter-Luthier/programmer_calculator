@@ -5,6 +5,11 @@ class CalculatorController:
         self.view = calculator_view
         self.view.handle_button_press = self.handle_button_press
         self.view.set_base(self.model.base)
+        self.setup_actions()
+
+    def setup_actions(self):
+        for button in self.view.buttons:
+            self.view.update_button_action(button, self.handle_button_press)
 
     def handle_button_press(self, button_text):
         mode_list = ['Decimal', 'Hexadecimal', 'Binary']

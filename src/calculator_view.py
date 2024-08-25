@@ -1,9 +1,16 @@
+from pathlib import Path
+
 from PyQt6.QtWidgets import *
+from button_widget import CustomRoundButton
+
+light_style_path = Path(__file__).parent.absolute() / 'resources' / 'light_style.qss'
+dark_style_path = Path(__file__).parent.absolute() / 'resources' / 'dark_style.qss'
 
 
 class CalculatorView(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.buttons = None
         self.display_num_bits = 8
         self.working_value = 0
         self.base = 10
@@ -32,39 +39,41 @@ class CalculatorView(QMainWindow):
 
         # -- Input Keys -- #
 
-        self.button_a = QPushButton('A')
-        self.button_a.clicked.connect(lambda: self.handle_button_press('A'))
-        self.button_b = QPushButton('B')
-        self.button_b.clicked.connect(lambda: self.handle_button_press('B'))
-        self.button_c = QPushButton('C')
-        self.button_c.clicked.connect(lambda: self.handle_button_press('C'))
-        self.button_d = QPushButton('D')
-        self.button_d.clicked.connect(lambda: self.handle_button_press('D'))
-        self.button_e = QPushButton('E')
-        self.button_e.clicked.connect(lambda: self.handle_button_press('E'))
-        self.button_f = QPushButton('F')
-        self.button_f.clicked.connect(lambda: self.handle_button_press('F'))
+        self.button0 = CustomRoundButton('0', self.handle_button_press, light_style_path, 0)
+        self.button1 = CustomRoundButton('1', self.handle_button_press, light_style_path, 1)
+        self.button2 = CustomRoundButton('2', self.handle_button_press, light_style_path, 2)
+        self.button3 = CustomRoundButton('3', self.handle_button_press, light_style_path, 3)
+        self.button4 = CustomRoundButton('4', self.handle_button_press, light_style_path, 4)
+        self.button5 = CustomRoundButton('5', self.handle_button_press, light_style_path, 5)
+        self.button6 = CustomRoundButton('6', self.handle_button_press, light_style_path, 6)
+        self.button7 = CustomRoundButton('7', self.handle_button_press, light_style_path, 7)
+        self.button8 = CustomRoundButton('8', self.handle_button_press, light_style_path, 8)
+        self.button9 = CustomRoundButton('9', self.handle_button_press, light_style_path, 9)
+        self.button_a = CustomRoundButton('A', self.handle_button_press, light_style_path, 10)
+        self.button_b = CustomRoundButton('B', self.handle_button_press, light_style_path, 11)
+        self.button_c = CustomRoundButton('C', self.handle_button_press, light_style_path, 12)
+        self.button_d = CustomRoundButton('D', self.handle_button_press, light_style_path, 13)
+        self.button_e = CustomRoundButton('E', self.handle_button_press, light_style_path, 14)
+        self.button_f = CustomRoundButton('F', self.handle_button_press, light_style_path, 15)
 
-        self.button1 = QPushButton('1')
-        self.button1.clicked.connect(lambda: self.handle_button_press('1'))
-        self.button2 = QPushButton('2')
-        self.button2.clicked.connect(lambda: self.handle_button_press('2'))
-        self.button3 = QPushButton('3')
-        self.button3.clicked.connect(lambda: self.handle_button_press('3'))
-        self.button4 = QPushButton('4')
-        self.button4.clicked.connect(lambda: self.handle_button_press('4'))
-        self.button5 = QPushButton('5')
-        self.button5.clicked.connect(lambda: self.handle_button_press('5'))
-        self.button6 = QPushButton('6')
-        self.button6.clicked.connect(lambda: self.handle_button_press('6'))
-        self.button7 = QPushButton('7')
-        self.button7.clicked.connect(lambda: self.handle_button_press('7'))
-        self.button8 = QPushButton('8')
-        self.button8.clicked.connect(lambda: self.handle_button_press('8'))
-        self.button9 = QPushButton('9')
-        self.button9.clicked.connect(lambda: self.handle_button_press('9'))
-        self.button0 = QPushButton('0')
-        self.button0.clicked.connect(lambda: self.handle_button_press('0'))
+        self.buttons = [
+            self.button0,
+            self.button1,
+            self.button2,
+            self.button3,
+            self.button4,
+            self.button5,
+            self.button6,
+            self.button7,
+            self.button8,
+            self.button9,
+            self.button_a,
+            self.button_b,
+            self.button_c,
+            self.button_d,
+            self.button_e,
+            self.button_f
+        ]
 
         # -- Input Keys Layout -- #
 
@@ -134,19 +143,16 @@ class CalculatorView(QMainWindow):
     def set_input_mode_decimal(self):
         self.set_disabled_a_f_keys(True)
         self.set_disabled_2_9_keys(False)
-        # self.ctrl.set_base_mode('Decimal')
         print('Decimal Mode')
 
     def set_input_mode_hex(self):
         self.set_disabled_a_f_keys(False)
         self.set_disabled_2_9_keys(False)
-        # self.ctrl.set_base_mode('Hexadecimal')
         print('Hexadecimal Mode')
 
     def set_input_mode_binary(self):
         self.set_disabled_a_f_keys(True)
         self.set_disabled_2_9_keys(True)
-        # self.ctrl.set_base_mode('Binary')
         print('Binary Mode')
 
     def set_disabled_a_f_keys(self, state: bool):
@@ -190,8 +196,13 @@ class CalculatorView(QMainWindow):
         binary_string = format(self.working_value, f'0{binary_length}_b').replace('_', ' ')
         return binary_string
 
+    def update_button_action(self, button, click_action):
+        button.clicked.disconnect()
+        button.clicked.connect(lambda: click_action(button.text()))
 
-"""class CalcButton(QPushButton):
-    def __init__(self, label, controller_obj):
+
+class CalcButton(QPushButton):
+    def __init__(self, label, handle_button_press, num_value=None):
         super().__init__(label)
-       """
+        self.setMinimumHeight(35)
+        self.clicked.connect(handle_button_press(label))
