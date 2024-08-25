@@ -1,8 +1,10 @@
 
-class CalcController:
-    def __init__(self, calculator_model):
+class CalculatorController:
+    def __init__(self, calculator_model, calculator_view):
         self.model = calculator_model
-        # self.view = calculator_view
+        self.view = calculator_view
+        self.view.handle_button_press = self.handle_button_press
+        self.view.set_base(self.model.base)
 
     def handle_button_press(self, button_text):
         mode_list = ['Decimal', 'Hexadecimal', 'Binary']
@@ -13,14 +15,14 @@ class CalcController:
             self.handle_numeric_input(operand_list.index(button_text))
 
     def handle_numeric_input(self, input_value):
-        # self.old_handle_numeric_input(input_value)
         self.model.working_value = self.model.working_value * self.model.base + input_value
+        self.view.update_output(self.model.working_value)
 
     def set_base_mode(self, mode):
-        self.model.base_mode = mode
         modes = {
             'Decimal': 10,
             'Hexadecimal': 16,
             'Binary': 2
         }
         self.model.base = modes[mode]
+        self.view.set_base(modes[mode])

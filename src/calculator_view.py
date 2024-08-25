@@ -1,35 +1,25 @@
-import sys
 from PyQt6.QtWidgets import *
 
-# from .calculator_controller import CalcController
 
-
-class CalcButton(QPushButton):
-    def __init__(self, label, controller_obj):
-        super().__init__(label)
-
-
-class CalculatorWindow(QMainWindow):
-    def __init__(self, controller):
+class CalculatorView(QMainWindow):
+    def __init__(self):
         super().__init__()
-        self.ctrl = controller
-        self.model = controller.model
+        self.display_num_bits = 8
+        self.working_value = 0
+        self.base = 10
 
         self.setWindowTitle('Binary Calculator')
-        self.calc_mode = self.model.base_mode
-
-
 
         # -- Input Mode Keys -- #
 
         button_decimal = QPushButton('Decimal')
-        button_decimal.clicked.connect(self.set_input_mode_decimal)
+        button_decimal.clicked.connect(lambda: self.handle_button_press('Decimal'))
 
         button_hex = QPushButton('Hexadecimal')
-        button_hex.clicked.connect(self.set_input_mode_hex)
+        button_hex.clicked.connect(lambda: self.handle_button_press('Hexadecimal'))
 
         button_binary = QPushButton('Binary')
-        button_binary.clicked.connect(self.set_input_mode_binary)
+        button_binary.clicked.connect(lambda: self.handle_button_press('Binary'))
 
         layout_input_mode = QHBoxLayout()
 
@@ -43,38 +33,38 @@ class CalculatorWindow(QMainWindow):
         # -- Input Keys -- #
 
         self.button_a = QPushButton('A')
-        self.button_a.clicked.connect(lambda: self.handle_key_press('A'))
+        self.button_a.clicked.connect(lambda: self.handle_button_press('A'))
         self.button_b = QPushButton('B')
-        self.button_b.clicked.connect(lambda: self.handle_key_press('B'))
+        self.button_b.clicked.connect(lambda: self.handle_button_press('B'))
         self.button_c = QPushButton('C')
-        self.button_c.clicked.connect(lambda: self.handle_key_press('C'))
+        self.button_c.clicked.connect(lambda: self.handle_button_press('C'))
         self.button_d = QPushButton('D')
-        self.button_d.clicked.connect(lambda: self.handle_key_press('D'))
+        self.button_d.clicked.connect(lambda: self.handle_button_press('D'))
         self.button_e = QPushButton('E')
-        self.button_e.clicked.connect(lambda: self.handle_key_press('E'))
+        self.button_e.clicked.connect(lambda: self.handle_button_press('E'))
         self.button_f = QPushButton('F')
-        self.button_f.clicked.connect(lambda: self.handle_key_press('F'))
+        self.button_f.clicked.connect(lambda: self.handle_button_press('F'))
 
         self.button1 = QPushButton('1')
-        self.button1.clicked.connect(lambda: self.handle_key_press('1'))
+        self.button1.clicked.connect(lambda: self.handle_button_press('1'))
         self.button2 = QPushButton('2')
-        self.button2.clicked.connect(lambda: self.handle_key_press('2'))
+        self.button2.clicked.connect(lambda: self.handle_button_press('2'))
         self.button3 = QPushButton('3')
-        self.button3.clicked.connect(lambda: self.handle_key_press('3'))
+        self.button3.clicked.connect(lambda: self.handle_button_press('3'))
         self.button4 = QPushButton('4')
-        self.button4.clicked.connect(lambda: self.handle_key_press('4'))
+        self.button4.clicked.connect(lambda: self.handle_button_press('4'))
         self.button5 = QPushButton('5')
-        self.button5.clicked.connect(lambda: self.handle_key_press('5'))
+        self.button5.clicked.connect(lambda: self.handle_button_press('5'))
         self.button6 = QPushButton('6')
-        self.button6.clicked.connect(lambda: self.handle_key_press('6'))
+        self.button6.clicked.connect(lambda: self.handle_button_press('6'))
         self.button7 = QPushButton('7')
-        self.button7.clicked.connect(lambda: self.handle_key_press('7'))
+        self.button7.clicked.connect(lambda: self.handle_button_press('7'))
         self.button8 = QPushButton('8')
-        self.button8.clicked.connect(lambda: self.handle_key_press('8'))
+        self.button8.clicked.connect(lambda: self.handle_button_press('8'))
         self.button9 = QPushButton('9')
-        self.button9.clicked.connect(lambda: self.handle_key_press('9'))
+        self.button9.clicked.connect(lambda: self.handle_button_press('9'))
         self.button0 = QPushButton('0')
-        self.button0.clicked.connect(lambda: self.handle_key_press('0'))
+        self.button0.clicked.connect(lambda: self.handle_button_press('0'))
 
         # -- Input Keys Layout -- #
 
@@ -109,7 +99,7 @@ class CalculatorWindow(QMainWindow):
         binary_label = QLabel('Binary')
         self.binary_output = QLabel()
 
-        self.update_outputs()
+        self.update_output(self.working_value)
 
         layout_output = QGridLayout()
         layout_output.addWidget(decimal_label, 0, 0, 1, 1)
@@ -132,26 +122,31 @@ class CalculatorWindow(QMainWindow):
 
         self.setCentralWidget(self.container)
 
-        self.set_input_mode_decimal()
-
-        print(self.model.max_binary_value)
+    def set_base(self, base):
+        base_dict = {
+            2: self.set_input_mode_binary,
+            10: self.set_input_mode_decimal,
+            16: self.set_input_mode_hex,
+        }
+        if base in base_dict:
+            base_dict[base]()
 
     def set_input_mode_decimal(self):
         self.set_disabled_a_f_keys(True)
         self.set_disabled_2_9_keys(False)
-        self.ctrl.set_base_mode('Decimal')
+        # self.ctrl.set_base_mode('Decimal')
         print('Decimal Mode')
 
     def set_input_mode_hex(self):
         self.set_disabled_a_f_keys(False)
         self.set_disabled_2_9_keys(False)
-        self.ctrl.set_base_mode('Hexadecimal')
+        # self.ctrl.set_base_mode('Hexadecimal')
         print('Hexadecimal Mode')
 
     def set_input_mode_binary(self):
         self.set_disabled_a_f_keys(True)
         self.set_disabled_2_9_keys(True)
-        self.ctrl.set_base_mode('Binary')
+        # self.ctrl.set_base_mode('Binary')
         print('Binary Mode')
 
     def set_disabled_a_f_keys(self, state: bool):
@@ -172,43 +167,31 @@ class CalculatorWindow(QMainWindow):
         self.button8.setDisabled(state)
         self.button9.setDisabled(state)
 
-    """
-    def key_press_event(self, event):
-        if isinstance(event, QKeyEvent):
-            key_text = event.text()
-            self.ctrl.handle_numeric_input(key_text.upper())
-            self.update_outputs()
-            """
+    def handle_button_press(self, input_value):
+        pass
 
-    def handle_key_press(self, input_value):
-        self.ctrl.handle_button_press(input_value)
-        self.update_outputs()
-
-    def update_outputs(self):
-        self.decimal_output.setText(str(format(self.model.working_value, ',')))
+    def update_output(self, value):
+        self.working_value = value
+        self.decimal_output.setText(str(format(self.working_value, ',')))
         self.hex_output.setText(self.format_hex_output())
         self.binary_output.setText(self.format_binary_output())
 
     def format_hex_output(self):
-        hex_string = format(self.model.working_value, 'X')
+        hex_string = format(self.working_value, 'X')
         reversed_hex_string = hex_string[::-1]
-        hex_string = ' '.join(reversed_hex_string[i:i+2] for i in range(0, len(hex_string), 2))
+        hex_string = ' '.join(reversed_hex_string[i:i + 2] for i in range(0, len(hex_string), 2))
         return hex_string[::-1]
 
     def format_binary_output(self):
-        if self.model.working_value > self.model.max_binary_value:
+        max_binary_value = 2 ** self.display_num_bits - 1
+        if self.working_value > max_binary_value:
             return '** Overflow **'
-        binary_length = (self.model.display_num_bits - 1) + self.model.display_num_bits // 4
-        binary_string = format(self.model.working_value, f'0{binary_length}_b').replace('_', ' ')
+        binary_length = (self.display_num_bits - 1) + self.display_num_bits // 4
+        binary_string = format(self.working_value, f'0{binary_length}_b').replace('_', ' ')
         return binary_string
 
 
-if __name__ == '__main__':
-    from calculator_model import CalcModel
-    from calculator_controller import CalcController
-    app = QApplication(sys.argv)
-
-    window = CalculatorWindow(CalcController(CalcModel()))
-    window.show()
-
-    app.exec()
+"""class CalcButton(QPushButton):
+    def __init__(self, label, controller_obj):
+        super().__init__(label)
+       """
