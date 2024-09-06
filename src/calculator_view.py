@@ -25,8 +25,8 @@ class CalculatorView(QMainWindow):
         button_decimal = QPushButton('Decimal')
         button_decimal.clicked.connect(lambda: self.handle_button_press('Decimal'))
 
-        button_hex = QPushButton('Hexadecimal')
-        button_hex.clicked.connect(lambda: self.handle_button_press('Hexadecimal'))
+        button_hex = QPushButton('Hex')
+        button_hex.clicked.connect(lambda: self.handle_button_press('Hex'))
 
         button_binary = QPushButton('Binary')
         button_binary.clicked.connect(lambda: self.handle_button_press('Binary'))
@@ -37,69 +37,68 @@ class CalculatorView(QMainWindow):
         layout_input_mode.addWidget(button_hex)
         layout_input_mode.addWidget(button_binary)
 
-        self.input_mode = QWidget()
-        self.input_mode.setLayout(layout_input_mode)
+        self.input_mode_widget = QWidget()
+        self.input_mode_widget.setLayout(layout_input_mode)
 
-        # -- Input Keys -- #
+        # -- Operand Keys -- #
 
-        self.button0 = CustomRoundButton('0', self.handle_button_press, self.style_path, 0)
-        self.button1 = CustomRoundButton('1', self.handle_button_press, self.style_path, 1)
-        self.button2 = CustomRoundButton('2', self.handle_button_press, self.style_path, 2)
-        self.button3 = CustomRoundButton('3', self.handle_button_press, self.style_path, 3)
-        self.button4 = CustomRoundButton('4', self.handle_button_press, self.style_path, 4)
-        self.button5 = CustomRoundButton('5', self.handle_button_press, self.style_path, 5)
-        self.button6 = CustomRoundButton('6', self.handle_button_press, self.style_path, 6)
-        self.button7 = CustomRoundButton('7', self.handle_button_press, self.style_path, 7)
-        self.button8 = CustomRoundButton('8', self.handle_button_press, self.style_path, 8)
-        self.button9 = CustomRoundButton('9', self.handle_button_press, self.style_path, 9)
-        self.button_a = CustomRoundButton('A', self.handle_button_press, self.style_path, 10)
-        self.button_b = CustomRoundButton('B', self.handle_button_press, self.style_path, 11)
-        self.button_c = CustomRoundButton('C', self.handle_button_press, self.style_path, 12)
-        self.button_d = CustomRoundButton('D', self.handle_button_press, self.style_path, 13)
-        self.button_e = CustomRoundButton('E', self.handle_button_press, self.style_path, 14)
-        self.button_f = CustomRoundButton('F', self.handle_button_press, self.style_path, 15)
+        self.operand_values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
+        self.operand_buttons = []
 
-        self.operand_buttons = [
-            self.button0,
-            self.button1,
-            self.button2,
-            self.button3,
-            self.button4,
-            self.button5,
-            self.button6,
-            self.button7,
-            self.button8,
-            self.button9,
-            self.button_a,
-            self.button_b,
-            self.button_c,
-            self.button_d,
-            self.button_e,
-            self.button_f
-        ]
+        for operand in self.operand_values:
+            self.operand_buttons.append(
+                CustomRoundButton(
+                    operand, self.handle_button_press, self.style_path, self.operand_values.index(operand)))
 
-        # -- Input Keys Layout -- #
+        # -- Operand Keys Layout -- #
 
-        self.layout_input = QGridLayout()
+        self.layout_operand = QGridLayout()
 
         column_num = 2
         row_num = 5
         for button in self.operand_buttons:
-            self.layout_input.addWidget(button, row_num, column_num)
+            self.layout_operand.addWidget(button, row_num, column_num)
             column_num += 1
             if column_num > 2:
                 row_num -= 1
                 column_num = 0
             self.create_shortcut(button, button.text())
 
-        self.input_keys = QWidget()
-        self.input_keys.setLayout(self.layout_input)
+        self.operand_widget = QWidget()
+        self.operand_widget.setLayout(self.layout_operand)
+
+        # -- Operator Keys -- #
+
+        self.operator_values = ['AND', 'OR', 'NOT', 'NOR', 'XOR', 'XNOR', '÷', 'x', '<<', '-', '+', '>>', 'AC', 'CL', '=']
+        self.operator_buttons = []
+
+        for operator in self.operator_values:
+            self.operator_buttons.append(
+                CustomRoundButton(
+                    operator, self.handle_button_press, self.style_path, operator))
+
+        # -- Operator Keys Layout -- #
+
+        self.layout_operator = QGridLayout()
+
+        column_num = 0
+        row_num = 0
+        for button in self.operator_buttons:
+            self.layout_operator.addWidget(button, row_num, column_num)
+            column_num += 1
+            if column_num > 2:
+                row_num += 1
+                column_num = 0
+            self.create_shortcut(button, button.text())
+
+        self.operator_widget = QWidget()
+        self.operator_widget.setLayout(self.layout_operator)
 
         # -- Output Displays -- #
 
         decimal_label = QLabel('Decimal')
         self.decimal_output = QLabel()
-        hex_label = QLabel('Hexadecimal')
+        hex_label = QLabel('Hex')
         self.hex_output = QLabel()
         binary_label = QLabel('Binary')
         self.binary_output = QLabel()
@@ -114,13 +113,14 @@ class CalculatorView(QMainWindow):
         layout_output.addWidget(binary_label, 2, 0, 1, 1)
         layout_output.addWidget(self.binary_output, 2, 1, 1, 4)
 
-        self.output = QWidget()
-        self.output.setLayout(layout_output)
+        self.output_widget = QWidget()
+        self.output_widget.setLayout(layout_output)
 
         self.layout_container = QGridLayout()
-        self.layout_container.addWidget(self.output, 0, 0)
-        self.layout_container.addWidget(self.input_mode, 1, 0)
-        self.layout_container.addWidget(self.input_keys, 2, 0)
+        self.layout_container.addWidget(self.output_widget, 0, 0, 1, 2)
+        self.layout_container.addWidget(self.input_mode_widget, 1, 0, 1, 2)
+        self.layout_container.addWidget(self.operand_widget, 2, 0)
+        self.layout_container.addWidget(self.operator_widget, 2, 1)
 
         self.container = QWidget()
         self.container.setLayout(self.layout_container)
@@ -133,10 +133,7 @@ class CalculatorView(QMainWindow):
 
     def set_disabled_buttons(self):
         for button in self.operand_buttons:
-            if button.value >= self.base:
-                button.setDisabled(True)
-            else:
-                button.setDisabled(False)
+            button.set_disabled(self.base)
 
     def handle_button_press(self, input_value):
         pass
@@ -166,7 +163,6 @@ class CalculatorView(QMainWindow):
         button.clicked.connect(lambda: click_action(button.text()))
 
     def create_shortcut(self, button, key):
-        # Create a shortcut and connect it to the button's click action
         shortcut = QShortcut(QKeySequence(key), button)
         shortcut.activated.connect(button.click)
         self.shortcuts.append(shortcut)

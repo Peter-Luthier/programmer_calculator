@@ -46,7 +46,7 @@ class CustomRoundButton(QPushButton):
         """)
 
     def set_disabled(self, threshold: int):
-        if self.value > threshold:
+        if self.value >= threshold:
             self.setDisabled(True)
         else:
             self.setDisabled(False)

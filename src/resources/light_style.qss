@@ -2,7 +2,7 @@ QPushButton {
     height: 50px;
     width: 50px;
     max-height: 50px;
-    max-width: 50px;
+
     border-radius: 25px;
     background-color: #ffffff;
     color: #000000;
