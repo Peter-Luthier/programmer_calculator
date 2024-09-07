@@ -1,8 +1,7 @@
 from PyQt6.QtWidgets import QPushButton
-from PyQt6.QtCore import QSize
 
 class CustomRoundButton(QPushButton):
-    def __init__(self, text: str, click_action, stylesheet_path: str, value: int=None, parent=None):
+    def __init__(self, text: str, click_action, stylesheet_path: str, value: int and str=None, parent=None):
         super().__init__(text, parent)
         self.value = value  # Assign the numerical value to the button
 
@@ -16,7 +15,7 @@ class CustomRoundButton(QPushButton):
             self.clicked.connect(self.default_click_action)
 
     def default_click_action(self):
-        print('button_widget action')
+        print(f'button {self.text} action')
 
     def load_stylesheet(self, stylesheet_path: str):
         try:

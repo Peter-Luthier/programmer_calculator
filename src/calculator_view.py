@@ -13,12 +13,12 @@ class CalculatorView(QMainWindow):
         super().__init__()
         self.shortcuts = []
         self.operand_buttons = None
-        self.display_num_bits = 8
+        self.display_num_bits = 16
         self.working_value = 0
         self.base = 10
         self.style_path = styles['Light']
 
-        self.setWindowTitle('Binary Calculator')
+        self.setWindowTitle('Programmer Calculator')
 
         # -- Input Mode Keys -- #
 
@@ -67,15 +67,52 @@ class CalculatorView(QMainWindow):
         self.operand_widget = QWidget()
         self.operand_widget.setLayout(self.layout_operand)
 
-        # -- Operator Keys -- #
+        # -- Operator Buttons -- #
 
-        self.operator_values = ['AND', 'OR', 'NOT', 'NOR', 'XOR', 'XNOR', '÷', 'x', '<<', '-', '+', '>>', 'AC', 'CL', '=']
-        self.operator_buttons = []
+        button_plus = CustomRoundButton('+', self.handle_button_press, self.style_path, '+')
+        button_minus = CustomRoundButton('-', self.handle_button_press, self.style_path, '-')
+        button_multiply = CustomRoundButton('x', self.handle_button_press, self.style_path, '*')
+        button_divide = CustomRoundButton('÷', self.handle_button_press, self.style_path, '//')
+        button_shift_left = CustomRoundButton('<<', self.handle_button_press, self.style_path, '<<')
+        button_shift_right = CustomRoundButton('>>', self.handle_button_press, self.style_path, '>>')
+        button_binary_and = CustomRoundButton('AND', self.handle_button_press, self.style_path, '&')
+        button_binary_or = CustomRoundButton('OR', self.handle_button_press, self.style_path, '|')
+        button_binary_not = CustomRoundButton('NOT', self.handle_button_press, self.style_path, '~')
+        button_binary_xor = CustomRoundButton('XOR', self.handle_button_press, self.style_path, '^')
+        button_binary_nor = CustomRoundButton('NOR', self.handle_button_press, self.style_path, 'NOR')
+
+        # self.operator_values = ['AND', 'OR', 'NOT', 'NOR', 'XOR', 'XNOR', '÷', 'x', '<<', '-', '+', '>>', 'AC', 'CL', '=']
+
+
+
+        self.operator_buttons = [button_plus,
+                                 button_minus,
+                                 button_multiply,
+                                 button_divide,
+                                 button_shift_left,
+                                 button_shift_right,
+                                 button_binary_and,
+                                 button_binary_or,
+                                 button_binary_not,
+                                 button_binary_xor,
+                                 button_binary_nor]
+
+        # -- Function Buttons -- #
+
+        button_equals = CustomRoundButton('=', self.handle_button_press, self.style_path, '=')
+        button_clear = CustomRoundButton('C', self.handle_button_press, self.style_path, 'C')
+        button_all_clear = CustomRoundButton('AC', self.handle_button_press, self.style_path, 'AC')
+
+        self.function_buttons = [button_equals,
+                                 button_clear,
+                                 button_all_clear]
+
+        """self.operator_buttons = []
 
         for operator in self.operator_values:
             self.operator_buttons.append(
                 CustomRoundButton(
-                    operator, self.handle_button_press, self.style_path, operator))
+                    operator, self.handle_button_press, self.style_path, operator))"""
 
         # -- Operator Keys Layout -- #
 
@@ -83,7 +120,7 @@ class CalculatorView(QMainWindow):
 
         column_num = 0
         row_num = 0
-        for button in self.operator_buttons:
+        for button in self.operator_buttons + self.function_buttons:
             self.layout_operator.addWidget(button, row_num, column_num)
             column_num += 1
             if column_num > 2:
@@ -139,6 +176,8 @@ class CalculatorView(QMainWindow):
         pass
 
     def update_output(self, value):
+        if not value:
+            value = 0
         self.working_value = value
         self.decimal_output.setText(str(format(self.working_value, ',')))
         self.hex_output.setText(self.format_hex_output())
