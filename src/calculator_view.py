@@ -13,7 +13,8 @@ class CalculatorView(QMainWindow):
         super().__init__()
         self.shortcuts = []
         self.operand_buttons = None
-        self.display_num_bits = 16
+        self.bit_depth = 16
+        self.max_bits_per_line = 32
         self.working_value = 0
         self.base = 10
         self.style_path = styles['Light']
@@ -39,6 +40,38 @@ class CalculatorView(QMainWindow):
 
         self.input_mode_widget = QWidget()
         self.input_mode_widget.setLayout(layout_input_mode)
+
+        # -- Bit Depth Keys -- #
+
+        button_64_bit = QPushButton('64 bit')
+        button_64_bit.clicked.connect(lambda: self.handle_button_press('64 bit'))
+
+        button_32_bit = QPushButton('32 bit')
+        button_32_bit.clicked.connect(lambda: self.handle_button_press('32 bit'))
+
+        button_16_bit = QPushButton('16 bit')
+        button_16_bit.clicked.connect(lambda: self.handle_button_press('16 bit'))
+
+        button_8_bit = QPushButton('8 bit')
+        button_8_bit.clicked.connect(lambda: self.handle_button_press('8 bit'))
+
+        button_minus_bit = QPushButton('-bit')
+        button_minus_bit.clicked.connect(lambda: self.handle_button_press('- bit'))
+
+        button_plus_bit = QPushButton('+bit')
+        button_plus_bit.clicked.connect(lambda: self.handle_button_press('+ bit'))
+
+        layout_bit_depth = QHBoxLayout()
+
+        layout_bit_depth.addWidget(button_64_bit)
+        layout_bit_depth.addWidget(button_32_bit)
+        layout_bit_depth.addWidget(button_16_bit)
+        layout_bit_depth.addWidget(button_8_bit)
+        layout_bit_depth.addWidget(button_minus_bit)
+        layout_bit_depth.addWidget(button_plus_bit)
+
+        self.input_bit_depth_widget = QWidget()
+        self.input_bit_depth_widget.setLayout(layout_bit_depth)
 
         # -- Operand Keys -- #
 
@@ -100,19 +133,12 @@ class CalculatorView(QMainWindow):
         # -- Function Buttons -- #
 
         button_equals = CustomRoundButton('=', self.handle_button_press, self.style_path, '=')
-        button_clear = CustomRoundButton('C', self.handle_button_press, self.style_path, 'C')
+        button_clear = CustomRoundButton('CL', self.handle_button_press, self.style_path, 'CL')
         button_all_clear = CustomRoundButton('AC', self.handle_button_press, self.style_path, 'AC')
 
         self.function_buttons = [button_equals,
                                  button_clear,
                                  button_all_clear]
-
-        """self.operator_buttons = []
-
-        for operator in self.operator_values:
-            self.operator_buttons.append(
-                CustomRoundButton(
-                    operator, self.handle_button_press, self.style_path, operator))"""
 
         # -- Operator Keys Layout -- #
 
@@ -156,8 +182,9 @@ class CalculatorView(QMainWindow):
         self.layout_container = QGridLayout()
         self.layout_container.addWidget(self.output_widget, 0, 0, 1, 2)
         self.layout_container.addWidget(self.input_mode_widget, 1, 0, 1, 2)
-        self.layout_container.addWidget(self.operand_widget, 2, 0)
-        self.layout_container.addWidget(self.operator_widget, 2, 1)
+        self.layout_container.addWidget(self.input_bit_depth_widget, 2, 0, 1, 2)
+        self.layout_container.addWidget(self.operand_widget, 3, 0)
+        self.layout_container.addWidget(self.operator_widget, 3, 1)
 
         self.container = QWidget()
         self.container.setLayout(self.layout_container)
@@ -190,14 +217,27 @@ class CalculatorView(QMainWindow):
         return hex_string[::-1]
 
     def format_binary_output(self):
-        max_binary_value = 2 ** self.display_num_bits - 1
+        max_binary_value = 2 ** self.bit_depth - 1
         if self.working_value > max_binary_value:
             return '** Overflow **'
-        binary_length = (self.display_num_bits - 1) + self.display_num_bits // 4
-        binary_string = format(self.working_value, f'0{binary_length}_b').replace('_', ' ')
+        binary_string = self.format_binary_string(self.working_value, self.bit_depth, self.max_bits_per_line)
         return binary_string
 
-    def update_button_action(self, button, click_action):
+    @staticmethod
+    def format_binary_string(num, bit_length, max_bits_per_line):
+        binary_string = f"{num:0{bit_length}b}"
+        rev_bin_str = binary_string[::-1]
+        binary_lines = [rev_bin_str[i:i+max_bits_per_line] for i in range(0, len(rev_bin_str), max_bits_per_line)]
+        line_list = []
+        for line in binary_lines:
+            grouped_bits = ' '.join([line[i:i+4] for i in range(0, len(line), 4)])
+            line_list.insert(0, grouped_bits[::-1])
+        formatted_string =  '\n'.join(line_list)
+
+        return formatted_string
+
+    @staticmethod
+    def update_button_action(button, click_action):
         button.clicked.disconnect()
         button.clicked.connect(lambda: click_action(button.text()))
 

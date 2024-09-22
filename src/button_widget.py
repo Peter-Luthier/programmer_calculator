@@ -5,10 +5,8 @@ class CustomRoundButton(QPushButton):
         super().__init__(text, parent)
         self.value = value  # Assign the numerical value to the button
 
-        # Load and apply the initial style sheet
         self.load_stylesheet(stylesheet_path)
 
-        # Set the default click behavior
         if click_action:
             self.clicked.connect(lambda: click_action(self.text))
         else:
@@ -24,8 +22,7 @@ class CustomRoundButton(QPushButton):
                 self.setStyleSheet(stylesheet)
         except FileNotFoundError:
             print(f"Stylesheet not found: {stylesheet_path}")
-            # You can set a default style here if needed
-            self.set_default_style(50)
+            self.set_default_style(30)
 
     def set_default_style(self, size: int):
         self.setStyleSheet(f"""
