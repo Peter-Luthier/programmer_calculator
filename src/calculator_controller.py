@@ -11,7 +11,7 @@ class CalculatorController:
         self.base_value_list = [2, 10, 16]
         self.model = calculator_model
         self.view = calculator_view
-        self.view.handle_button_press = self.handle_button_press
+        self.view.set_button_callback(self.handle_button_press)
         self.view.set_base(self.model.base)
         self.view.bit_depth = self.model.bit_depth
         self.setup_actions()

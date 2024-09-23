@@ -3,6 +3,8 @@ from PyQt6.QtGui import QShortcut, QKeySequence
 from PyQt6.QtWidgets import *
 from button_widget import CustomRoundButton
 
+# @TODO - Change display to monospaced font.
+
 styles = {
     'Light': Path(__file__).parent.absolute() / 'resources' / 'light_style.qss',
     'Dark': Path(__file__).parent.absolute() / 'resources' / 'dark_style.qss',
@@ -18,6 +20,7 @@ class CalculatorView(QMainWindow):
         self.working_value = 0
         self.base = 10
         self.style_path = styles['Light']
+        self.button_callback = None
 
         self.setWindowTitle('Programmer Calculator')
 
@@ -199,8 +202,11 @@ class CalculatorView(QMainWindow):
         for button in self.operand_buttons:
             button.set_disabled(self.base)
 
-    def handle_button_press(self, input_value):
-        pass
+    def set_button_callback(self, callback):
+        self.button_callback = callback
+
+    def handle_button_press(self, button_text):
+        self.button_callback(button_text)
 
     def update_output(self, value):
         if not value:

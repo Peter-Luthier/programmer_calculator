@@ -18,7 +18,6 @@ class TestCalculatorModel(TestCase):
         calculator.handle_numeric_input(4)
         calculator.handle_numeric_input(2)
         calculator.evaluate()
-        calculator = CalculatorModel()
         calculator.handle_numeric_input(4)
         calculator.handle_numeric_input(8)
         calculator.handle_operator('-')
