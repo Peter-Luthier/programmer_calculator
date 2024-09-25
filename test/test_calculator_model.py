@@ -25,8 +25,8 @@ class TestCalculatorModel(TestCase):
         calculator.handle_numeric_input(0)
         calculator.clear_state()
         self.assertEqual(calculator.working_value, None)
-        self.assertEqual(calculator.operand1, None)
-        self.assertEqual(calculator.operand2, None)
+        self.assertEqual(calculator.x_register, None)
+        self.assertEqual(calculator.y_register, None)
         self.assertEqual(calculator.operator, None)
         self.assertEqual(calculator.result, None)
 
@@ -125,13 +125,23 @@ class TestCalculatorModel(TestCase):
         expected_result = 30
         self.assertEqual(calculator.evaluate(), expected_result)
 
-    def test_bitwise_not(self):
+    def test_unsigned_bitwise_not(self):
         calculator = CalculatorModel()
         calculator.handle_numeric_input(2)
         calculator.handle_numeric_input(7)
         calculator.handle_not_operator()
 
         expected_result = 228
+        self.assertEqual(calculator.working_value, expected_result)
+
+    def test_signed_bitwise_not(self):
+        calculator = CalculatorModel()
+        calculator.signed = True
+        calculator.handle_numeric_input(2)
+        calculator.handle_numeric_input(7)
+        calculator.handle_not_operator()
+
+        expected_result = -28
         self.assertEqual(calculator.working_value, expected_result)
 
     def test_bitwise_shift_left(self):

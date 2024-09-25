@@ -134,5 +134,5 @@ class CalculatorController:
         self.view.update_output(self.model.working_value)
 
     def print_model_state(self):
-        print(f"{self.model.operand1} {self.model.operator} {self.model.operand2}, "
+        print(f"{self.model.x_register} {self.model.operator} {self.model.y_register}, "
               f"Result: {self.model.result}, WorkingVal: {self.model.working_value}")

@@ -3,8 +3,8 @@
 class CalculatorModel:
     def __init__(self):
         self.working_value = None
-        self.operand1 = None
-        self.operand2 = None
+        self.x_register = None
+        self.y_register = None
         self.operator = None
         self.result = None
         self.base = 10
@@ -29,15 +29,15 @@ class CalculatorModel:
         self.working_value = None
 
     def clear_operand1(self):
-        self.operand1 = None
+        self.x_register = None
 
     def clear_operator(self):
         self.operator = None
 
     def clear_state(self):
         self.working_value = None
-        self.operand1 = None
-        self.operand2 = None
+        self.x_register = None
+        self.y_register = None
         self.operator = None
         self.result = None
         print('Clear All')
@@ -51,16 +51,16 @@ class CalculatorModel:
 
     def handle_operator(self, operator_value):
         if self.result:
-            self.operand1 = self.result
+            self.x_register = self.result
         else:
             if self.operator:
-                self.operand1 = self.evaluate()
+                self.x_register = self.evaluate()
         if self.result is not None:
-            self.operand1 = self.result
-        elif self.operand2:
-            self.operand1 = self.evaluate()
+            self.x_register = self.result
+        elif self.y_register:
+            self.x_register = self.evaluate()
         else:
-            self.operand1 = self.working_value
+            self.x_register = self.working_value
         self.operator = operator_value
         self.result = None
         self.working_value = None
@@ -83,16 +83,16 @@ class CalculatorModel:
         self.working_value = self.working_value >> 1
 
     def evaluate(self):
-        if not self.operand2:
-            if self.operand1 is None and self.operator is None:
+        if not self.y_register:
+            if self.x_register is None and self.operator is None:
                 if self.result is None:
                     self.result = self.working_value
                     self.working_value = None
                 return self.result
         if self.result:
-            self.operand1 = self.result
+            self.x_register = self.result
         else:
-            self.operand2 = self.working_value if self.working_value is not None else self.operand1
+            self.y_register = self.working_value if self.working_value is not None else self.x_register
         eval_result = self.evaluate_current_state()
         if not self.signed and eval_result < 0:
             raise ValueError('Overflow')
@@ -109,7 +109,7 @@ class CalculatorModel:
             function = special_operations[self.operator]
             return function()
         try:
-            eval_result =  eval(str(self.operand1) + self.operator + str(self.operand2))
+            eval_result =  eval(str(self.x_register) + self.operator + str(self.y_register))
         except ZeroDivisionError:
             print('Cannot divide by zero')
             return None
@@ -123,14 +123,18 @@ class CalculatorModel:
             return value ^ mask
 
     def evaluate_nor_operation(self):
-        or_result = self.operand1 | self.operand2
+        or_result = self.x_register | self.y_register
         return self.evaluate_not_operation(or_result)
 
     def evaluate_xnor_operation(self):
-        xor_result = self.operand1 ^ self.operand2
+        xor_result = self.x_register ^ self.y_register
         return self.evaluate_not_operation(xor_result)
 
     def check_value_range(self, value):
-        max_value = 2 ** self.bit_depth - 1
-        min_value = -max_value if self.signed else 0
+        if self.signed is True:
+            max_value = 2 ** (self.bit_depth - 1) -1
+            min_value = -max_value
+        else:
+            max_value = 2 ** self.bit_depth - 1
+            min_value = 0
         return min_value <= value <= max_value
